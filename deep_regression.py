@@ -148,6 +148,28 @@ class NaiveSGDOptimizer:
 
 
 @dataclass
+class MomentumSGDOptimizer:
+    learn_rate: float = 0.001
+    gamma: float = 0.9
+    v: GradientTape = field(init=False, default=None)
+
+    def __call__(self, grad_tape: GradientTape) -> GradientTape:
+        if not self.v:
+            self._init_moment_vectors(grad_tape)
+
+        for i, (layer_grads, layer_v_prev) in enumerate(zip(grad_tape, self.v)):
+            for j, (grads, v_prev) in enumerate(zip(layer_grads, layer_v_prev)):
+                adj_grads = v_prev * self.gamma + self.learn_rate * grads
+                grad_tape[i][j] = adj_grads
+                self.v[i][j] = adj_grads
+
+        return grad_tape
+
+    def _init_moment_vectors(self, grad_tape: GradientTape):
+        self.v = [[np.zeros_like(g) for g in l] for l in grad_tape]
+
+
+@dataclass
 class AdamOptimizer:
     learn_rate: float = 0.001
     beta_1: float = 0.9
