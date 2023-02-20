@@ -17,3 +17,13 @@ based on backpropagation and math calculus.
 ```sh
 python3 deep_regression.py
 ```
+
+### Deep Classification: Categorize Hand-Written Digits
+- Architecture: Feed-forward neural network
+- Layers: Dense, ReLU, Sigmoid
+- Losses: Cross Entropy
+- Optimizers: SGD, ADAM
+
+```sh
+python3 deep_classification.py
+```
