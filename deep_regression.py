@@ -87,6 +87,25 @@ class ReLULayer:
         pass
 
 
+@dataclass
+class ELULayer:
+    alpha: float = 0.5
+
+    def compile(self, input_dims: int):
+        pass
+
+    def forward(self, inputs: np.ndarray) -> np.ndarray:
+        return np.where(inputs > 0.0, inputs, self.alpha * (np.exp(inputs) - 1.0))
+
+    def backward(
+            self, orig_inputs: np.ndarray, orig_outputs: np.ndarray,
+            delta: np.ndarray) -> Tuple[List[np.ndarray], np.ndarray]:
+        return [], np.where(orig_inputs > 0.0, delta, self.alpha * np.exp(orig_inputs) * delta)
+
+    def update(self, grads: List[np.ndarray]):
+        pass
+
+
 class SigmoidLayer:
     def compile(self, input_dims: int):
         pass
@@ -236,9 +255,9 @@ def partition_dataset(x: np.ndarray, y: np.ndarray) -> DatasetSplits:
 def create_model(feature_dims: int) -> Model:
     model = Model([
         DenseLayer(64),
-        ReLULayer(),
+        ELULayer(),
         DenseLayer(64),
-        ReLULayer(),
+        ELULayer(),
         DenseLayer(1)
     ])
     model.compile(feature_dims)
